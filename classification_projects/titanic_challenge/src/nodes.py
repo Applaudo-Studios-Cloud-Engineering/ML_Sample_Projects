@@ -66,7 +66,7 @@ def fill_empty_embarked_values(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def fill_empty_fare_values(df: pd.Data) -> pd.DataFrame:
+def fill_empty_fare_values(df: pd.DataFrame) -> pd.DataFrame:
     df['Fare'] = df['Fare'].fillna(0)
     df['Fare'] = df['Fare'].astype(int)
 
