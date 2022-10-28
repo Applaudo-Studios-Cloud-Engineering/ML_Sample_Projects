@@ -66,6 +66,13 @@ def fill_empty_embarked_values(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def fill_empty_fare_values(df: pd.Data) -> pd.DataFrame:
+    df['Fare'] = df['Fare'].fillna(0)
+    df['Fare'] = df['Fare'].astype(int)
+
+    return df
+
+
 def encode_embarked_ports(df: pd.DataFrame) -> pd.DataFrame:
     """
     Encodes Embarked feature column values as numbers. Computes like numbers.
@@ -80,7 +87,7 @@ def encode_embarked_ports(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def create_deck_feature(df: pd.DataFrame) -> pd.DataFrame:
+def create_deck_feature(df: pd.DataFrame, drop_cabin: bool=True) -> pd.DataFrame:
     """
     Creates Deck feature which is based on the cabin feature.
     :param df: dataset with Cabin feature
@@ -94,7 +101,8 @@ def create_deck_feature(df: pd.DataFrame) -> pd.DataFrame:
     df['Deck'] = df['Deck'].fillna(0)
     df['Deck'] = df['Deck'].astype(int)
 
-    df.drop(['Cabin'], axis=1)
+    if drop_cabin:
+        df.drop(['Cabin'], axis=1)
 
     return df
 
