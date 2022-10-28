@@ -251,7 +251,7 @@ def create_and_train_decision_tree_model(X_train, Y_train) -> DecisionTreeClassi
     return model
 
 
-def test_model(model: DecisionTreeClassifier, X_test, Y_test) -> float:
+def compute_accuracy(model: DecisionTreeClassifier, X_test, Y_test) -> float:
     """
     Evaluates accuracy of the model given X and Y testing datasets
     :param model: trained DecisionTreeClassifier model

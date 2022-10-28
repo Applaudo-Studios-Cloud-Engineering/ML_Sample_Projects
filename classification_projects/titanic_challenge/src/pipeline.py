@@ -3,7 +3,7 @@ import pandas as pd
 from .nodes import create_dataset, drop_unnecessary_columns, fill_empty_age_values, fill_empty_embarked_values, \
     encode_embarked_ports, create_deck_feature, encode_age_ranges, create_title_feature, encode_title_feature, \
     encode_sex, encode_fare, create_age_class_feature, create_relatives_feature, split_dataset_for_training, \
-    create_and_train_decision_tree_model, test_model, fill_empty_fare_values
+    create_and_train_decision_tree_model, compute_accuracy, fill_empty_fare_values
 
 
 def create_preprocessing_pipeline(dataset_path: str, drop_passenger_id: bool) -> pd.DataFrame:
@@ -49,13 +49,23 @@ def create_ml_pipeline(train_df: pd.DataFrame):
 
     model = create_and_train_decision_tree_model(X_train, Y_train)
 
-    return model
+    training_acc = compute_accuracy(model, X_train, Y_train)
 
-
-def compute
+    return model, training_acc
 
 
 def prepare_submission(model, test_df_path):
+    df = pd.read_csv(test_df_path)
+    ids = df['PassengerId']
+    X_test = df.drop(['PassengerId'], axis=1)
+    Y_pred = model.predict(X_test)
+
+    data = {'PassengerId': ids, 'Survived': Y_pred}
+
+    submission_df = pd.DataFrame(data)
+
+    submission_df.to_csv('data/submission.csv')
+
 
 
 
