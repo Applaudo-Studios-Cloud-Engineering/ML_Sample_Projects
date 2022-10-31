@@ -185,4 +185,4 @@ fabric.properties
  .idea
 
  # Kaggle submission files
- submission.csv
+ **/submission.csv
