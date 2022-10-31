@@ -201,14 +201,14 @@ def encode_age_ranges(df: pd.DataFrame) -> pd.DataFrame:
 
     df['Age'] = df['Age'].astype(int)
 
-    df.loc[df['Age'] <= 11, 'Age Class'] = 0
-    df.loc[(df['Age'] > 11 & df['Age'] <= 18), 'Age Class'] = 1
-    df.loc[(df['Age'] > 18 & df['Age'] <= 22), 'Age Class'] = 2
-    df.loc[(df['Age'] > 22 & df['Age'] <= 27), 'Age Class'] = 3
-    df.loc[(df['Age'] > 27 & df['Age'] <= 33), 'Age Class'] = 4
-    df.loc[(df['Age'] > 33 & df['Age'] <= 40), 'Age Class'] = 5
-    df.loc[(df['Age'] > 40 & df['Age'] <= 66), 'Age Class'] = 6
-    df.loc[df['Age'] > 66, 'Age Class'] = 7
+    df.loc[df['Age'] <= 11, 'Age'] = 0
+    df.loc[(df['Age'] > 11) & (df['Age'] <= 18), 'Age'] = 1
+    df.loc[(df['Age'] > 18) & (df['Age'] <= 22), 'Age'] = 2
+    df.loc[(df['Age'] > 22) & (df['Age'] <= 27), 'Age'] = 3
+    df.loc[(df['Age'] > 27) & (df['Age'] <= 33), 'Age'] = 4
+    df.loc[(df['Age'] > 33) & (df['Age'] <= 40), 'Age'] = 5
+    df.loc[(df['Age'] > 40) & (df['Age'] <= 66), 'Age'] = 6
+    df.loc[df['Age'] > 66, 'Age'] = 7
 
     return df
 
