@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 
 import pandas as pd
 import numpy as np
@@ -7,7 +7,7 @@ import re
 from sklearn.tree import DecisionTreeClassifier
 
 
-# Feature Engineering functions
+# Preprocessing Functions
 
 def create_dataset(path: str) -> pd.DataFrame:
     """
@@ -27,7 +27,7 @@ def drop_unnecessary_columns(df: pd.DataFrame, columns: List[str]) -> pd.DataFra
     :return: DataFrame with dropped columns, keeping only the necessary
     """
 
-    return df.drop(columns, axis=1, inplace=True)
+    return df.drop(columns, axis=1)
 
 
 def fill_empty_age_values(df: pd.DataFrame) -> pd.DataFrame:
@@ -37,6 +37,8 @@ def fill_empty_age_values(df: pd.DataFrame) -> pd.DataFrame:
     :param df: dataset containing
     :return: DataFrame with filled Age values
     """
+
+    print(df.shape)
 
     mean = df['Age'].mean()
     std = df['Age'].std()
@@ -67,22 +69,14 @@ def fill_empty_embarked_values(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def fill_empty_fare_values(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    FIlls empty values in Fare feature column
+    :param df: dataset containing Fare column
+    :return: dataset with nonempty values for Fare
+    """
+
     df['Fare'] = df['Fare'].fillna(0)
     df['Fare'] = df['Fare'].astype(int)
-
-    return df
-
-
-def encode_embarked_ports(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Encodes Embarked feature column values as numbers. Computes like numbers.
-    :param df: dataset containing Embarked feature column
-    :return: DataFrame with encoded values for Embarked feature
-    """
-
-    encoded_ports = {'S': 0, 'C': 1, 'Q': 2}
-
-    df['Embarked'] = df['Embarked'].map(encoded_ports)
 
     return df
 
@@ -90,6 +84,7 @@ def encode_embarked_ports(df: pd.DataFrame) -> pd.DataFrame:
 def create_deck_feature(df: pd.DataFrame, drop_cabin: bool=True) -> pd.DataFrame:
     """
     Creates Deck feature which is based on the cabin feature.
+    :param drop_cabin:
     :param df: dataset with Cabin feature
     :return: DataFrame with Deck feature and dropped Cabin feature
     """
@@ -107,23 +102,30 @@ def create_deck_feature(df: pd.DataFrame, drop_cabin: bool=True) -> pd.DataFrame
     return df
 
 
-def encode_age_ranges(df: pd.DataFrame) -> pd.DataFrame:
+def create_age_class_feature(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Encodes age ranges from Age feature column as a number.
-    :param df: dataset containing
-    :return: DataFrame with Age feature
+    Creates Age Class feature which is the product of the Age and Pclass.
+    :param df: dataset containing Pclass and Age features
+    :return: dataset with Age Class feature
     """
 
-    df['Age'] = df['Age'].astype(int)
+    df['Age_Class'] = df['Age'] * df['Pclass']
 
-    df.loc[df['Age'] <= 11, 'Age Class'] = 0
-    df.loc[(df['Age'] > 11 & df['Age'] <= 18), 'Age Class'] = 1
-    df.loc[(df['Age'] > 18 & df['Age'] <= 22), 'Age Class'] = 2
-    df.loc[(df['Age'] > 22 & df['Age'] <= 27), 'Age Class'] = 3
-    df.loc[(df['Age'] > 27 & df['Age'] <= 33), 'Age Class'] = 4
-    df.loc[(df['Age'] > 33 & df['Age'] <= 40), 'Age Class'] = 5
-    df.loc[(df['Age'] > 40 & df['Age'] <= 66), 'Age Class'] = 6
-    df.loc[df['Age'] > 66, 'Age Class'] = 7
+    return df
+
+
+def create_relatives_feature(df: pd.DataFrame, drop_features: bool=True) -> pd.DataFrame:
+    """
+    Create Relatives feature which is the sum of Siblings Spouses [SibSp] and Parents Children [Parch]
+    :param df: dataset containing SibSp and Parch features
+    :param drop_features: if true drops SibSp and Parch features since they are part of relatives
+    :return: dataset with Relatives feature
+    """
+
+    df['Relatives'] = df['SibSp'] + df['Parch']
+
+    if drop_features:
+        df.drop(['SibSp', 'Parch'], axis=1, inplace=True)
 
     return df
 
@@ -164,6 +166,20 @@ def encode_title_feature(df: pd.DataFrame, titles_dic: Dict[str, int]) -> pd.Dat
     return df
 
 
+def encode_embarked_ports(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Encodes Embarked feature column values as numbers. Computes like numbers.
+    :param df: dataset containing Embarked feature column
+    :return: DataFrame with encoded values for Embarked feature
+    """
+
+    encoded_ports = {'S': 0, 'C': 1, 'Q': 2}
+
+    df['Embarked'] = df['Embarked'].map(encoded_ports)
+
+    return df
+
+
 def encode_sex(df: pd.DataFrame, sex_dict: Dict[str, int]) -> pd.DataFrame:
     """
     Encodes Sex feature as a number. Computers like numbers.
@@ -172,6 +188,27 @@ def encode_sex(df: pd.DataFrame, sex_dict: Dict[str, int]) -> pd.DataFrame:
     :return: DataFrame with Sex feature encoded
     """
     df['Sex'] = df['Sex'].map(sex_dict)
+
+    return df
+
+
+def encode_age_ranges(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Encodes age ranges from Age feature column as a number.
+    :param df: dataset containing
+    :return: DataFrame with Age feature
+    """
+
+    df['Age'] = df['Age'].astype(int)
+
+    df.loc[df['Age'] <= 11, 'Age Class'] = 0
+    df.loc[(df['Age'] > 11 & df['Age'] <= 18), 'Age Class'] = 1
+    df.loc[(df['Age'] > 18 & df['Age'] <= 22), 'Age Class'] = 2
+    df.loc[(df['Age'] > 22 & df['Age'] <= 27), 'Age Class'] = 3
+    df.loc[(df['Age'] > 27 & df['Age'] <= 33), 'Age Class'] = 4
+    df.loc[(df['Age'] > 33 & df['Age'] <= 40), 'Age Class'] = 5
+    df.loc[(df['Age'] > 40 & df['Age'] <= 66), 'Age Class'] = 6
+    df.loc[df['Age'] > 66, 'Age Class'] = 7
 
     return df
 
@@ -190,34 +227,6 @@ def encode_fare(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[(df['Fare'] > 99) & (df['Fare'] <= 250), 'Fare'] = 4
     df.loc[df['Fare'] > 250, 'Fare'] = 5
     df['Fare'] = df['Fare'].astype(int)
-
-    return df
-
-
-def create_age_class_feature(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Creates Age Class feature which is the product of the Age and Pclass.
-    :param df: dataset containing Pclass and Age features
-    :return: dataset with Age Class feature
-    """
-
-    df['Age_Class'] = df['Age'] * df['Pclass']
-
-    return df
-
-
-def create_relatives_feature(df: pd.DataFrame, drop_features: bool=True) -> pd.DataFrame:
-    """
-    Create Relatives feature which is the sum of Siblings Spouses [SibSp] and Parents Children [Parch]
-    :param df: dataset containing SibSp and Parch features
-    :param drop_features: if true drops SibSp and Parch features since they are part of relatives
-    :return: dataset with Relatives feature
-    """
-
-    df['Relatives'] = df['SibSp'] + df['Parch']
-
-    if drop_features:
-        df.drop(['SibSp', 'Parch'], axis=1, inplace=True)
 
     return df
 

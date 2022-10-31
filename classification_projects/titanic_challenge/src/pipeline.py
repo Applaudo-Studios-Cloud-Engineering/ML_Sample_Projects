@@ -6,7 +6,7 @@ from nodes import create_dataset, drop_unnecessary_columns, fill_empty_age_value
     create_and_train_decision_tree_model, compute_accuracy, fill_empty_fare_values
 
 
-def create_preprocessing_pipeline(dataset_path: str, drop_passenger_id: bool) -> pd.DataFrame:
+def create_preprocessing_pipeline(dataset_path: str, drop_passenger_id: bool=False) -> pd.DataFrame:
     df = create_dataset(dataset_path)
 
     if drop_passenger_id:
@@ -39,6 +39,7 @@ def create_feature_engineering_pipeline(df: pd.DataFrame) -> pd.DataFrame:
     df = encode_fare(df)
 
     df = encode_age_ranges(df)
+
     titles = {"Mr": 1, "Miss": 2, "Mrs": 3, "Master": 4, "Rare": 5}
 
     df = encode_title_feature(df, titles)
@@ -69,3 +70,7 @@ def prepare_submission(model, test_df_path, submission_file_path):
     submission_df = pd.DataFrame(data)
 
     submission_df.to_csv(submission_file_path)
+
+    return submission_df
+
+
