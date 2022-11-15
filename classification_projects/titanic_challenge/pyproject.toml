@@ -1,6 +1,0 @@
-[project]
-name = "Decision Tree Classifier for Titanic Challenge"
-version = "0.0.1"
-authors = [
-    {name = "Rodrigo Morales", email = "andresmorales.ro@gmail.com"}
-]
