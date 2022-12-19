@@ -1,0 +1,77 @@
+# Configures the pipeline for this project. 
+# Pre-processing and training steps can't be disabled.
+# Do not rename any step or property.
+# You can choose to not build an image for a step and use the image of another step instead, but with a different entrypoint.
+
+app: titanic
+namespace: argo-workflows
+workflow-template: ml-pipeline
+
+# S3 config
+s3:
+  bucket: dev-titanic-y7mfxvpwkrnlqm1a
+  oidc-audience: https://api-test-cluster-23db6147e4301ff8.elb.us-east-1.amazonaws.com
+  bucket-access-role-arn: arn:aws:iam::133412723156:role/test-cluster-dev-workflows-projects-data-bucket-access-role
+
+steps:
+  pre-processing:
+    # Requirements:
+    # Contain a python entrypoint script in /work
+    # Read the dataset from /work/data/train.csv
+    # Save resulting dataframe as pickle in /work/data/dataframe.pkl
+    image-name: fernandesyuri/titanic-training
+    entrypoint: src/preprocessing.py
+    build: false
+    dockerfile: null
+    s3:
+      dataset-folder: data
+      dataset-name: train.csv
+
+  feature-engineering:
+    # Requirements:
+    # Contain a python entrypoint script in /work
+    # Read the dataframe from /work/data/dataframe.pkl
+    # Save resulting dataframe as pickle overwriting /work/data/dataframe.pkl
+    enabled: true
+    image-name: fernandesyuri/titanic-training
+    entrypoint: src/feature-engineering.py
+    build: false
+    dockerfile: null
+
+  training:
+    # Requirements:
+    # Contain a python entrypoint script in /work
+    # Read the dataframe from /work/data/dataframe.pkl
+    # Save model as pickle in /work/model/ with any name terminated by "_accuracy.pkl". Example: titanic_92.33.pkl
+    image-name: fernandesyuri/titanic-training
+    entrypoint: src/training.py
+    build: true
+    dockerfile: training.dockerfile
+    s3:
+      models-folder: models
+
+  test:
+    # Requirements:
+    # Contain a python entrypoint script in /work
+    # Load the pickle model from /work/model/model.pkl
+    # Read the dataset from /work/data/test.csv
+    enabled: true
+    image-name: fernandesyuri/titanic-training
+    entrypoint: src/test.py
+    build: false
+    dockerfile: null
+    s3:
+      dataset-folder: data
+      dataset-name: test.csv
+
+  serve:
+    # Requirements:
+    # Contain a python entrypoint script in /work
+    # Load the pickle model from /work/models
+    enabled: true
+    image-name: fernandesyuri/titanic-serve
+    entrypoint: serve.py
+    build: false
+    dockerfile: serve.dockerfile
+    environments-repo: git@github.com:fernandesyuri/environments.git
+    values-file: dev/helm3/titanic.yaml
