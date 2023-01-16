@@ -53,13 +53,15 @@ def apply_distribution_transformation(col: pd.Series, transformation_to_apply: s
         return [res_col, null_count]
 
 
-def train_test_and_evaluate_model(ML_lib: str, package_name: str, algorithm_name: str, cv_split: int, X: pd.DataFrame,
-                                  y: pd.Series, test_size: float = 0.2, random_state: int = 123) -> [pd.DataFrame,
-                                                                                                     pd.DataFrame,
-                                                                                                     pd.Series,
-                                                                                                     pd.Series, Any,
-                                                                                                     float, Any,
-                                                                                                     List[float]]:
+def train_test_and_evaluate_model(ML_lib: str, package_name: str | None, algorithm_name: str, cv_split: int,
+                                  X: pd.DataFrame, y: pd.Series, test_size: float = 0.2, random_state: int = 123) \
+        -> [pd.DataFrame,
+            pd.DataFrame,
+            pd.Series,
+            pd.Series, Any,
+            float, Any,
+            List[float]]:
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size, random_state)
 
     if ML_lib is 'xgboost':
@@ -80,7 +82,8 @@ def train_test_and_evaluate_model(ML_lib: str, package_name: str, algorithm_name
     return [X_train, X_test, y_train, y_test, model, acc, conf_matrix, cross_val]
 
 
-def tune_logistic_regression(X: pd.DataFrame,y: pd.Series, test_size: float = 0.2, random_state: int = 123, cv_split: int = 5, hyper_params: List[Any]= None):
+def tune_logistic_regression(X: pd.DataFrame, y: pd.Series, test_size: float = 0.2, random_state: int = 123,
+                             cv_split: int = 5, hyper_params: List[Any] = None):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size, random_state)
 
     model = LogisticRegression(hyper_params)
@@ -95,5 +98,3 @@ def tune_logistic_regression(X: pd.DataFrame,y: pd.Series, test_size: float = 0.
     cross_val = cross_val_score(model, X, y, cv=cv_split)
 
     return [X_train, X_test, y_train, y_test, model, acc, conf_matrix, cross_val]
-
-
