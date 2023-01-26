@@ -17,7 +17,7 @@ def remove_symbols(col: pd.Series, symbol: str, replace_symbol: Any = None) -> [
     return [res_col, null_count]
 
 
-def fill_empty_values(col: pd.Series, fill_values: List[Any], probabilities: List[float], type_inference: str) -> \
+def fill_empty_values(col: pd.Series, fill_values: List[Any], probabilities: List[float], type_inference: Any) -> \
         [pd.Series, int]:
     res_col = col.fillna(np.random.choice(fill_values, probabilities)).astype(type_inference)
     null_count = res_col.isnull().sum()

@@ -7,18 +7,18 @@ from nodes import fill_empty_values, encode_feature_values, apply_distribution_t
 def create_preprocessing_pipeline(path_to_csv: str, path_to_save: str):
     df = pd.read_csv(path_to_csv)
 
-    df['Credit_History'], null_count = fill_empty_values(df['Credit_History'], [1.0, 0.0], [0.84, 0.16], 'float')
-    df['Self_Employed'], null_count = fill_empty_values(df['Self_Employed'], ['No', 'Yes'], [0.81, 0.19], 'str')
+    df['Credit_History'], null_count = fill_empty_values(df['Credit_History'], [1.0, 0.0], [0.84, 0.16], float)
+    df['Self_Employed'], null_count = fill_empty_values(df['Self_Employed'], ['No', 'Yes'], [0.81, 0.19], str)
     df['LoanAmount'] = df['LoanAmount'].fillna(df['LoanAmount'].median())
     df['Dependents'], null_count = fill_empty_values(df['Dependents'], ['0', '1', '2', '3+'], [0.59, 0.17, 0.16, 0.08],
-                                                     'str')
+                                                     str)
     df['Loan_Amount_Term'], null_count = fill_empty_values(df['Loan_Amount_Term'],
                                                            [360.0, 180.0, 480.0, 300.0, 240.0, 84.0, 120.0, 60.0, 36.0,
                                                             12.0],
                                                            [0.83, 0.07, 0.02, 0.02, 0.02, 0.01, 0.01, 0.01, 0.005,
-                                                            0.005], 'float')
-    df['Gender'], null_count = fill_empty_values(df['Gender'], ['Male', 'Female'], [0.81, 0.19], 'str')
-    df['Married'], null_count = fill_empty_values(df['Married'], ['No', 'Yes'], [0.65, 0.35])
+                                                            0.005], float)
+    df['Gender'], null_count = fill_empty_values(df['Gender'], ['Male', 'Female'], [0.81, 0.19], str)
+    df['Married'], null_count = fill_empty_values(df['Married'], ['No', 'Yes'], [0.65, 0.35], str)
 
     df.to_csv(path_to_save, index=False)
 
