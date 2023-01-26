@@ -1,6 +1,6 @@
 import pandas as pd
 
-from nodes import fill_empty_values, encode_feature_values, apply_distribution_transformation, \
+from .nodes import fill_empty_values, encode_feature_values, apply_distribution_transformation, \
     train_test_and_evaluate_model
 
 
