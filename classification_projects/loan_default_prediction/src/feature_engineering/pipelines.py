@@ -19,13 +19,14 @@ def create_feature_engineering_pipeline(path_to_csv, path_to_save: str,
                                                             {'Urban': 0, 'Semiurban': 1, 'Rural': 2})
     print("Null values found in feature Property_Area after encoding process: ", null_count)
 
-    df['Loan_Status'], null_count = encode_feature_values(df['LoanAmount'], {'N': 0, 'Y': 1})
+    df['Loan_Status'], null_count = encode_feature_values(df['Loan_Status'], {'N': 0, 'Y': 1})
     print("Null values found in feature Loan_Status after encoding process: ", null_count)
 
     df['Self_Employed'], null_count = encode_feature_values(df['Self_Employed'], {'No': 0, 'Yes': 1})
     print("Null values found in feature Self_Employed after encoding process: ", null_count)
 
-    df['Total_Income'], null = sum_features([df['ApplicantIncome'], df['CoapplicantIncome']], 0)
+    df['Total_Income'], null_count = sum_features([df['ApplicantIncome'], df['CoapplicantIncome']], 0)
+    null_count = df['Total_Income'].isnull().sum()
     print("Null values found in feature Total_Income after sum process: ", null_count)
 
     if apply_distribution_transformations:
