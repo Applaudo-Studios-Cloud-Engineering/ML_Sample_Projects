@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  name: {{ package_name }}
+spec:
+  entrypoint: my-template
+  templates:
+    - name: my-template
+      metadata:
+        labels:
+          app: app-argo
+      retryStrategy:
+        limit: 1
+      container:
+        imagePullPolicy: Always
+        image: {{ image }}
+        command: ["python3", "src/main.py"]

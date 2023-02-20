@@ -10,11 +10,11 @@ def encode_feature_values(col: pd.Series, encode_dict: Dict[str, int]) -> [pd.Se
     return [res_col, null_count]
 
 
-def sum_features(feat_to_sum: List[pd.Series], fill_val: Any = None) -> [pd.Series, int]:
-    res_col = pd.Series([])
+def sum_features(feat_to_sum: List[np.ndarray], fill_val: Any = None) -> [pd.Series, int]:
+    res_col = feat_to_sum[0]
 
-    for feat in feat_to_sum:
-        res_col.add(feat, fill_value=fill_val)
+    for feat in feat_to_sum[1:]:
+        res_col = res_col.add(feat, fill_value=fill_val)
 
     null_count = res_col.isnull().sum()
 
