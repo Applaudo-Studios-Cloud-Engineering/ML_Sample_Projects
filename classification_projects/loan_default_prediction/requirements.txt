@@ -2,3 +2,17 @@ numpy
 pandas
 scikit-learn
 xgboost
+jinja2
+click
+pathlib
+boto3
+botocore
+click
+mlflow
+boto3
+pylint
+pytest
+pytest-mock
+pytest-cov
+requests
+websockets

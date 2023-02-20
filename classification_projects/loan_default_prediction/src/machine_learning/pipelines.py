@@ -19,4 +19,6 @@ def create_ML_pipeline(path_to_csv: str):
     X_train, X_test, y_train, y_test, model, acc, conf_matrix, cross_val \
         = train_test_and_evaluate_model('xgboost', None, 'XGBClassifier', 5, X, y)
 
+    print('Model trained successfully, acc: ', acc)
+
     return model, acc

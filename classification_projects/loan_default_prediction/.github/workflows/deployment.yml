@@ -1,0 +1,62 @@
+name: "Deployment"
+on:
+  pull_request:
+    branches:
+      - master
+      - main
+
+env:
+  GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+  AWS_REGION: us-east-1
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  K8S_CLUSTER: "mlflow-cluster"
+  IMAGE_REPOSITORY: ""
+  
+  jobs:
+  config:
+    runs-on: ubuntu-latest
+	
+	steps:
+	  - name: "mlops-repo: checkout"
+          uses: actions/checkout@v3
+          with:
+            repository: Applaudo-Studios-Cloud-Engineering/ML_Sample_Projects
+            path: devops-actions
+            token: ${{ env.GITHUB_TOKEN }}
+	   
+	  - name: "deploy: prepare environment"
+        run: |
+          # Generate VARIABLES
+          EPOCH=$(date '+%s')       # So images tags never overlap
+          DATE=$(date '+%Y%m%d')    # Readable date
+          NEW_IMAGE_NAME="loan-prediction"
+          NEW_IMAGE_TAG="${EPOCH}-${DATE}-${GITHUB_RUN_NUMBER}" # Workflow traceability
+              NEW_IMAGE_URL="${IMAGE_REPOSITORY}/${NEW_IMAGE_NAME}:${NEW_IMAGE_TAG}"
+          # Save them to GITHUB_ENV
+          echo "DATE=${DATE}" | tee -a "${GITHUB_ENV}"
+          echo "NEW_IMAGE_NAME=${NEW_IMAGE_NAME}" | tee -a "${GITHUB_ENV}"
+          echo "NEW_IMAGE_TAG=${NEW_IMAGE_TAG}" | tee -a "${GITHUB_ENV}"
+          echo "NEW_IMAGE_URL=${NEW_IMAGE_URL}" | tee -a "${GITHUB_ENV}"
+	
+	- name: "eks: connect to cluster"
+        run: |
+          aws eks --region "${AWS_REGION}" update-kubeconfig \
+            --name "${K8S_CLUSTER}"
+    
+	- name: "ecr: login"
+        run: |
+          if ! docker login "https://${IMAGE_REPOSITORY}"; then
+            aws ecr get-login-password --region us-east-1 | \
+              docker login  --username AWS --password-stdin "https://${IMAGE_REPOSITORY}"
+          fi 
+     
+	- name: "build: docker"
+	   run: | 
+	      docker build . -t "${NEW_IMAGE_URL}"
+		  
+     - name: "docker: push image to registry"
+        id: docker_push
+        run: |
+          docker push --quiet "${NEW_IMAGE_URL}" && \
+          echo "NEW_IMAGE_URL=${NEW_IMAGE_URL}" >> $GITHUB_OUTPUT

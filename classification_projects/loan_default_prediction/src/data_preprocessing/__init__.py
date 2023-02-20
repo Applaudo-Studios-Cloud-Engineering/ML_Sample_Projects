@@ -1,2 +1,2 @@
-from .pipelines import create_preprocessing_pipeline
-
+# data_preprocessing/__init__.py
+from .pipelines import *

@@ -5,6 +5,8 @@ import os
 import boto3
 import botocore
 
+import pickle
+
 def download_s3_train_data(PATH, BUCKET_NAME, KEY, FILENAME):
     s3_client = boto3.client('s3')
     s3 = boto3.resource('s3')
@@ -40,7 +42,7 @@ def download_s3_train_data(PATH, BUCKET_NAME, KEY, FILENAME):
 def uploud_s3_model(PATH, BUCKET_NAME, KEY):
     client = boto3.client('s3')
     entries = os.listdir(f'{PATH}/data')
-    filenames = [value for value in entries if re.search('^dt_classifier_acc_*', value)]
+    filenames = [value for value in entries if re.search('^dt_model_*', value)]
     if filenames:
         filename = filenames[-1]
         client.upload_file(f"{PATH}/data/{filename}", BUCKET_NAME, f'{KEY}{filename}')
@@ -49,3 +51,25 @@ def uploud_s3_model(PATH, BUCKET_NAME, KEY):
 
 def remove_data_dir(PATH):
     shutil.rmtree(PATH)
+
+def create_paths(ABS_PATH):
+    path = f'{ABS_PATH}/data'
+
+    train_path = path.split('/')
+    train_path.append('train.csv')
+    train_path = '/'.join(train_path)
+
+    preprocessing_path = path.split('/')
+    preprocessing_path.append('preprocessing.csv')
+    preprocessing_path = '/'.join(preprocessing_path)
+
+    feature_eng_path = path.split('/')
+    feature_eng_path.append('feature_engineering.csv')
+    feature_eng_path = '/'.join(feature_eng_path)
+
+    os.chdir(path)
+
+    return train_path, preprocessing_path, feature_eng_path, path
+
+def save_model(model):
+    pickle.dump(model, open(f'dt_model.pkl', 'wb'))

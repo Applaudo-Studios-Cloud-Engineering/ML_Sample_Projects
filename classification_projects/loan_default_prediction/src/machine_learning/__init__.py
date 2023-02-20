@@ -1,1 +1,2 @@
-from .pipelines import create_ML_pipeline
+# machine_learning/__init__.py
+from .pipelines import *
